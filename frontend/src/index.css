@@ -142,7 +142,11 @@ a {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  align-items: end;
+  align-items: start;
+}
+
+.form-grid > button {
+  align-self: end;
 }
 
 /* forms */
@@ -226,6 +230,7 @@ button.link {
 }
 
 .actions {
+  margin-top: 12px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -322,7 +327,7 @@ tr:last-child td {
 .sum-list {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 6px 16px;
+  gap: 6px 0;
   margin: 0;
 }
 
@@ -332,6 +337,7 @@ tr:last-child td {
 
 .sum-list dd {
   margin: 0;
+  padding-left: 16px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -347,6 +353,8 @@ tr:last-child td {
   font-size: 0.8rem;
   color: var(--muted);
   margin-top: -4px;
+  padding-left: 0;
+  text-align: left;
 }
 
 @media (max-width: 600px) {
