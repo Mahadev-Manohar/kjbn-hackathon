@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from app.core.logging import bind_log_context
 from app.domain.delivery_calculations import PriceCandidate
 from app.domain.errors import NotFoundError
-from app.domain.payout_rules import FROZEN_STATUSES, week_end
+from app.domain.payout_rules import FROZEN_STATUSES, ZERO, outstanding_advance, week_end
 from app.persistence.models import (
     Advance,
     Crop,
@@ -134,3 +134,27 @@ def unassigned_lines_in_week(session: Session, farmer_id: int, week_start: date)
             )
         )
     )
+
+
+def outstanding_by_farmer(session: Session, farmer_ids: list[int]) -> dict[int, Decimal]:
+    """Outstanding advance for several farmers in two grouped queries (rule 5: derived)."""
+    if not farmer_ids:
+        return {}
+    given = dict(
+        session.execute(
+            select(Advance.farmer_id, func.sum(Advance.amount))
+            .where(Advance.farmer_id.in_(farmer_ids))
+            .group_by(Advance.farmer_id)
+        ).all()
+    )
+    recovered = dict(
+        session.execute(
+            select(Payout.farmer_id, func.sum(Payout.advance_deduction))
+            .where(Payout.farmer_id.in_(farmer_ids), Payout.status.in_(FROZEN_PAYOUT_STATUSES))
+            .group_by(Payout.farmer_id)
+        ).all()
+    )
+    return {
+        farmer_id: outstanding_advance(given.get(farmer_id, ZERO), recovered.get(farmer_id, ZERO))
+        for farmer_id in farmer_ids
+    }

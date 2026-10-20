@@ -6,6 +6,7 @@ from app.api.deps import DbSession, Limit, Offset, RequestClock
 from app.api.schemas import (
     AdvanceIn,
     AdvanceOut,
+    FarmerBase,
     FarmerIn,
     FarmerOut,
     FarmerUpdate,
@@ -18,9 +19,21 @@ from app.services import ledger, master_data
 router = APIRouter(prefix="/farmers", tags=["farmers"])
 
 
+def _with_outstanding(session, farmers) -> list[FarmerOut]:
+    """Attach each farmer's derived outstanding advance (two grouped queries for the batch)."""
+    outstanding = queries.outstanding_by_farmer(session, [farmer.id for farmer in farmers])
+    return [
+        FarmerOut(
+            **FarmerBase.model_validate(farmer).model_dump(),
+            outstanding_advance=outstanding[farmer.id],
+        )
+        for farmer in farmers
+    ]
+
+
 @router.post("", response_model=FarmerOut, status_code=status.HTTP_201_CREATED)
 def create_farmer(body: FarmerIn, session: DbSession):
-    return master_data.create_farmer(session, **body.model_dump())
+    return _with_outstanding(session, [master_data.create_farmer(session, **body.model_dump())])[0]
 
 
 @router.get("", response_model=Page[FarmerOut])
@@ -31,17 +44,18 @@ def list_farmers(
     q: Annotated[str | None, Query(max_length=100, description="Name or village contains")] = None,
 ):
     items, total = master_data.list_farmers(session, q, limit, offset)
-    return Page(items=items, total=total, limit=limit, offset=offset)
+    return Page(items=_with_outstanding(session, items), total=total, limit=limit, offset=offset)
 
 
 @router.get("/{farmer_id}", response_model=FarmerOut)
 def get_farmer(farmer_id: int, session: DbSession):
-    return queries.get_farmer(session, farmer_id)
+    return _with_outstanding(session, [queries.get_farmer(session, farmer_id)])[0]
 
 
 @router.patch("/{farmer_id}", response_model=FarmerOut)
 def update_farmer(farmer_id: int, body: FarmerUpdate, session: DbSession):
-    return master_data.update_farmer(session, farmer_id, **body.model_dump(exclude_unset=True))
+    farmer = master_data.update_farmer(session, farmer_id, **body.model_dump(exclude_unset=True))
+    return _with_outstanding(session, [farmer])[0]
 
 
 @router.post(

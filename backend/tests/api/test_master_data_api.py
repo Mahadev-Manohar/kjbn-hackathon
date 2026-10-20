@@ -137,3 +137,64 @@ def test_price_validation(api, world):
     ):
         assert api.client.post("/api/v1/price-list", json=bad).status_code == 422, bad
     assert api.client.post("/api/v1/price-list", json={**good, "crop_id": 999}).status_code == 404
+
+
+def test_farmer_responses_include_the_derived_outstanding_advance(api, world):
+    farmer_id, crop_id = world["farmer"]["id"], world["crop"]["id"]
+    assert world["farmer"]["outstanding_advance"] == "0.00"
+    api.advance(farmer_id, "1000.00")
+    api.delivery(farmer_id, crop_id, delivered_on="2026-10-19")
+
+    def outstanding():
+        single = api.client.get(f"/api/v1/farmers/{farmer_id}").json()["outstanding_advance"]
+        listed = api.client.get("/api/v1/farmers").json()["items"][0]["outstanding_advance"]
+        assert single == listed
+        return single
+
+    assert outstanding() == "1000.00"  # a Draft recovers nothing
+    payout = api.generate_payout(farmer_id)
+    assert outstanding() == "1000.00"
+    api.action(f"/payouts/{payout['id']}/finalise")
+    assert outstanding() == "280.00"  # 30% of 2400.00 = 720.00 recovered
+    patched = api.client.patch(f"/api/v1/farmers/{farmer_id}", json={"village": "Newtown"}).json()
+    assert patched["outstanding_advance"] == "280.00"
+
+
+def test_search_treats_percent_and_underscore_as_plain_characters(api):
+    api.post("/farmers", {"name": "Arun Kumar", "phone": "9000000001", "village": "Greenfield"})
+    api.post("/farmers", {"name": "50% Farm_Co", "phone": "9000000002", "village": "Riverbend"})
+
+    def names(q):
+        items = api.client.get("/api/v1/farmers", params={"q": q}).json()["items"]
+        return [f["name"] for f in items]
+
+    assert names("%") == ["50% Farm_Co"]  # not "match everything"
+    assert names("_") == ["50% Farm_Co"]
+    assert names("a_n") == []  # underscore is not a single-character wildcard
+
+
+def test_concurrent_duplicate_price_entries_yield_one_created_rest_conflict(api, world):
+    from concurrent.futures import ThreadPoolExecutor
+
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    body = {
+        "crop_id": world["crop"]["id"],
+        "grade": "A",
+        "price_per_kg": "30.00",
+        "effective_from": "2026-06-01",
+    }
+
+    def add(_):
+        with TestClient(app) as client:
+            return client.post("/api/v1/price-list", json=body).status_code
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        statuses = list(pool.map(add, range(8)))
+    assert sorted(statuses) == [201] + [409] * 7  # never a 500 from the unique constraint
+    history = api.client.get(
+        "/api/v1/price-list", params={"crop_id": world["crop"]["id"], "grade": "A"}
+    ).json()
+    assert sum(1 for p in history["items"] if p["effective_from"] == "2026-06-01") == 1

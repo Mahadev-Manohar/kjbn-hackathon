@@ -69,12 +69,16 @@ class FarmerUpdate(StrictInput):
     ) = None
 
 
-class FarmerOut(Output):
+class FarmerBase(Output):
     id: int
     name: str
     phone: str
     village: str
     bank_reference: str | None
+
+
+class FarmerOut(FarmerBase):
+    outstanding_advance: Decimal  # derived: advances given minus recoveries on finalised payouts
 
 
 # ---- crops and prices ----------------------------------------------------------------------
@@ -260,7 +264,7 @@ class PayoutStatementOut(PayoutOut):
 
 # ---- ledger --------------------------------------------------------------------------------
 class LedgerOut(BaseModel):
-    farmer: FarmerOut
+    farmer: FarmerBase
     total_advances: Decimal
     total_recovered: Decimal
     outstanding_advance: Decimal
