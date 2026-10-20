@@ -1,6 +1,6 @@
 # Produce Procurement & Payout
 
-KJBN Labs Software Engineering Internship � Problem 4.
+KJBN Labs Software Engineering Internship - Problem 4.
 
 A produce procurement and payout system for recording farmer deliveries, applying crop-grade prices and moisture deductions, tracking advances, and generating weekly payouts.
 
