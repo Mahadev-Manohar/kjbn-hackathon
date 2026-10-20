@@ -2,9 +2,9 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.core.config import settings
+from app.persistence import models  # noqa: F401  (registers tables on Base.metadata)
 from app.persistence.base import Base
 
-# Import models here as they are created so Alembic can discover them.
 target_metadata = Base.metadata
 
 config = context.config

@@ -57,6 +57,11 @@ class Payout(Base):
     gross_amount: Mapped[Decimal] = mapped_column(
         Numeric(12, 2), nullable=False, default=Decimal("0.00")
     )
+    # Outstanding advance when the deduction was calculated; lets a finalised payout
+    # show its arithmetic without replaying history.
+    outstanding_before: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2), nullable=False, default=Decimal("0.00")
+    )
     advance_deduction: Mapped[Decimal] = mapped_column(
         Numeric(12, 2), nullable=False, default=Decimal("0.00")
     )
