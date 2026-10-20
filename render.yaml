@@ -1,0 +1,25 @@
+# Render Blueprint for the API. The UI is hosted on Vercel (frontend/vercel.json).
+# Create it with: Render dashboard -> New -> Blueprint -> select this repository.
+services:
+  - type: web
+    name: kjbn-produce-payout-api
+    runtime: docker
+    plan: free # sleeps after ~15 min idle; the first request afterwards takes about a minute
+    # Choose the Render region closest to your Neon project when creating the Blueprint.
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      # Secrets and per-environment values are entered in the dashboard (sync: false).
+      - key: DATABASE_URL
+        sync: false # Neon connection string, e.g. postgresql://user:pass@host/db?sslmode=require
+      - key: CORS_ORIGINS
+        sync: false # the Vercel UI origin, e.g. https://kjbn-hackathon.vercel.app
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ALLOW_TEST_CLOCK
+        value: "true" # reviewers use X-Test-Clock / the clock bar; see README section 10
+      - key: SEED_ON_START
+        value: "true" # migrate-and-seed runs on every start; both steps are idempotent
