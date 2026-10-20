@@ -4,6 +4,7 @@ import { ApiError } from '../api/client'
 import { createFarmer, listFarmers } from '../api/endpoints'
 import { ErrorMessage, Field, Loading, Notice, PageHeader } from '../components/common'
 import { useAsync } from '../hooks/useAsync'
+import { formatRupees } from '../lib/money'
 
 export function FarmersPage() {
   const [search, setSearch] = useState('')
@@ -89,6 +90,7 @@ export function FarmersPage() {
                 <th>Village</th>
                 <th>Phone</th>
                 <th>Bank reference</th>
+                <th className="num">Advance outstanding</th>
                 <th />
               </tr>
             </thead>
@@ -99,6 +101,7 @@ export function FarmersPage() {
                   <td>{farmer.village}</td>
                   <td>{farmer.phone}</td>
                   <td>{farmer.bank_reference ?? '-'}</td>
+                  <td className="num">{formatRupees(farmer.outstanding_advance)}</td>
                   <td>
                     <Link to={`/farmers/${farmer.id}`}>Ledger</Link>
                   </td>
@@ -106,7 +109,7 @@ export function FarmersPage() {
               ))}
               {farmers.data.items.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="muted">
+                  <td colSpan={6} className="muted">
                     No farmers found.
                   </td>
                 </tr>

@@ -18,7 +18,7 @@ import type {
 export const listFarmers = (q?: string, limit = 200) =>
   request<Page<Farmer>>('GET', '/farmers', { params: { q, limit } })
 
-export const createFarmer = (body: Omit<Farmer, 'id'>) =>
+export const createFarmer = (body: Omit<Farmer, 'id' | 'outstanding_advance'>) =>
   request<Farmer>('POST', '/farmers', { body })
 
 export const listCrops = () => request<Crop[]>('GET', '/crops')

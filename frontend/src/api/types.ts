@@ -17,6 +17,8 @@ export interface Farmer {
   phone: string
   village: string
   bank_reference: string | null
+  /** Derived by the backend: advances given minus recoveries on finalised payouts. */
+  outstanding_advance: string
 }
 
 export interface Crop {
@@ -114,7 +116,7 @@ export interface Advance {
 }
 
 export interface Ledger {
-  farmer: Farmer
+  farmer: Omit<Farmer, 'outstanding_advance'>
   total_advances: string
   total_recovered: string
   outstanding_advance: string
