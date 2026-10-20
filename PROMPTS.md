@@ -41,5 +41,13 @@
 | 5 | Claude Code | "Close the ledger pagination gap and commit the coverage report before starting M4." | Used. Ledger capped with counts, advances list added, `scripts/coverage_report.py` writes coverage.txt. |
 | 6 | Claude Code | "go" (start M4) | Used. Generated the React + TypeScript + Vite screens, API client and unit tests; I checked every flow in headless Chromium (21 checks, including 375px width) and fixed layout nits it showed. |
 
+## M5 - Deployment (Claude Code)
+
+| # | Tool | Prompt | What I did with it |
+|---|------|--------|--------------------|
+| 7 | Claude Code | "Don't start M5, got an issue on hitting /payouts" (pasted backend log) | Used the diagnosis: Neon lacked the new migration; I ran `alembic upgrade head` myself on the command it gave me. |
+| 8 | Claude Code | "Go, first tell me what all things to be done for M5" | Used the plan and split between repo work and manual dashboard steps. |
+| 9 | Claude Code | "Decisions: Render+Vercel+Neon yes; seed: do the best option; richer seed yes; repo name kjbn-hackathon" | Used. Seed Neon from the Render deploy, not from my machine. Generated Dockerfiles, compose, render.yaml, vercel.json, CI, seed; I verified the compose stack in a browser and validated render.yaml against Render's JSON schema. |
+
 ## Important implementation constraint
 The official internship documents are the source of truth for requirements. Any assumptions must be identified explicitly, and implementation decisions must not silently introduce unsupported business rules.
