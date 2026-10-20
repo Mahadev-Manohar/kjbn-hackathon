@@ -9,7 +9,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from app.api.errors import handle_unexpected_error
-from app.core.logging import request_id_var
+from app.core.logging import log_context_var, request_id_var
 
 logger = logging.getLogger("app.request")
 
@@ -29,6 +29,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request_id = _request_id_from(request)
         token = request_id_var.set(request_id)
+        context_token = log_context_var.set({})
         started = time.perf_counter()
         try:
             try:
@@ -48,3 +49,4 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             return response
         finally:
             request_id_var.reset(token)
+            log_context_var.reset(context_token)

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.domain.payout_rules import outstanding_advance
 from app.persistence import queries
@@ -37,7 +37,10 @@ def farmer_ledger(session: Session, farmer_id: int) -> FarmerLedger:
         .order_by(Advance.given_on.desc(), Advance.id.desc())
     )
     payouts = session.scalars(
-        select(Payout).where(Payout.farmer_id == farmer_id).order_by(Payout.week_start.desc())
+        select(Payout)
+        .where(Payout.farmer_id == farmer_id)
+        .options(joinedload(Payout.farmer))
+        .order_by(Payout.week_start.desc())
     )
     return FarmerLedger(
         farmer=farmer,

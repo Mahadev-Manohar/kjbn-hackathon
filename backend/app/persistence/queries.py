@@ -6,6 +6,7 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload, selectinload
 
+from app.core.logging import bind_log_context
 from app.domain.delivery_calculations import PriceCandidate
 from app.domain.errors import NotFoundError
 from app.domain.payout_rules import FROZEN_STATUSES, week_end
@@ -31,6 +32,7 @@ def lock_farmer(session: Session, farmer_id: int) -> Farmer:
     farmer = session.scalar(select(Farmer).where(Farmer.id == farmer_id).with_for_update())
     if farmer is None:
         raise NotFoundError(f"Farmer {farmer_id} not found", farmer_id=farmer_id)
+    bind_log_context(farmer_id=farmer_id)
     return farmer
 
 
@@ -38,6 +40,7 @@ def get_farmer(session: Session, farmer_id: int) -> Farmer:
     farmer = session.get(Farmer, farmer_id)
     if farmer is None:
         raise NotFoundError(f"Farmer {farmer_id} not found", farmer_id=farmer_id)
+    bind_log_context(farmer_id=farmer_id)
     return farmer
 
 
@@ -45,6 +48,7 @@ def get_crop(session: Session, crop_id: int) -> Crop:
     crop = session.scalar(select(Crop).where(Crop.id == crop_id).options(selectinload(Crop.grades)))
     if crop is None:
         raise NotFoundError(f"Crop {crop_id} not found", crop_id=crop_id)
+    bind_log_context(crop_id=crop_id)
     return crop
 
 
@@ -67,6 +71,7 @@ def get_delivery(session: Session, delivery_id: int) -> Delivery:
     )
     if delivery is None:
         raise NotFoundError(f"Delivery {delivery_id} not found", delivery_id=delivery_id)
+    bind_log_context(delivery_id=delivery_id, farmer_id=delivery.farmer_id)
     return delivery
 
 
@@ -74,7 +79,6 @@ def payout_query():
     return select(Payout).options(
         joinedload(Payout.farmer),
         selectinload(Payout.deliveries).joinedload(Delivery.crop),
-        selectinload(Payout.deliveries).joinedload(Delivery.payout),
     )
 
 
@@ -84,6 +88,7 @@ def get_payout(session: Session, payout_id: int) -> Payout:
     )
     if payout is None:
         raise NotFoundError(f"Payout {payout_id} not found", payout_id=payout_id)
+    bind_log_context(payout_id=payout_id, farmer_id=payout.farmer_id)
     return payout
 
 

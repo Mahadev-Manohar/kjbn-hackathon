@@ -172,7 +172,9 @@ class NoteIn(StrictInput):
     reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=500)]
 
 
-class DeliveryOut(Output):
+class DeliveryLineOut(Output):
+    """A delivery or note as one line of a payout statement."""
+
     id: int
     farmer_id: int
     crop_id: int
@@ -189,11 +191,14 @@ class DeliveryOut(Output):
     price_list_entry_id: int | None
     amount: Decimal
     payout_id: int | None
+    references_delivery_id: int | None
+    reason: str | None
+
+
+class DeliveryOut(DeliveryLineOut):
     payout_status: PayoutStatus | None = Field(
         default=None, validation_alias=AliasPath("payout", "status")
     )
-    references_delivery_id: int | None
-    reason: str | None
 
 
 class DeliveryPreviewOut(BaseModel):
@@ -250,7 +255,7 @@ class PayoutOut(Output):
 
 
 class PayoutStatementOut(PayoutOut):
-    deliveries: list[DeliveryOut]
+    deliveries: list[DeliveryLineOut]
 
 
 # ---- ledger --------------------------------------------------------------------------------
