@@ -5,7 +5,9 @@ from app.core.config import settings
 
 engine = create_engine(
     settings.database_url,
-    pool_pre_ping=True,
+    pool_pre_ping=True,  # reconnect after the host suspends an idle database
+    # Auto-prepared statements break behind transaction poolers such as Neon's pooled endpoint.
+    connect_args={"prepare_threshold": None},
 )
 
 SessionLocal = sessionmaker(
