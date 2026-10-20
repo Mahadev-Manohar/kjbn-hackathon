@@ -1,4 +1,4 @@
-Test run: 157 passed, 1 warning in 13.94s
+Test run: 182 passed, 1 warning in 29.27s
 
 == Overall (app/) ==
 Name                                   Stmts   Miss  Cover   Missing
@@ -11,16 +11,16 @@ app\api\middleware.py                     32      0   100%
 app\api\routers\__init__.py                0      0   100%
 app\api\routers\crops.py                  23      0   100%
 app\api\routers\deliveries.py             30      0   100%
-app\api\routers\farmers.py                30      0   100%
-app\api\routers\health.py                 13      0   100%
+app\api\routers\farmers.py                34      0   100%
+app\api\routers\health.py                 16      0   100%
 app\api\routers\payouts.py                32      0   100%
 app\api\routers\price_list.py             12      0   100%
-app\api\schemas.py                       170      0   100%
+app\api\schemas.py                       172      0   100%
 app\core\__init__.py                       0      0   100%
-app\core\config.py                        12      0   100%
-app\core\logging.py                       36      2    94%   18-19
+app\core\config.py                        20      0   100%
+app\core\logging.py                       36      0   100%
 app\domain\__init__.py                     0      0   100%
-app\domain\clock.py                       27      0   100%
+app\domain\clock.py                       29      0   100%
 app\domain\delivery_calculations.py       48      0   100%
 app\domain\delivery_rules.py              58      0   100%
 app\domain\errors.py                      16      0   100%
@@ -34,28 +34,28 @@ app\persistence\models\__init__.py         8      0   100%
 app\persistence\models\advance.py         13      0   100%
 app\persistence\models\crop.py            12      0   100%
 app\persistence\models\crop_grade.py      10      0   100%
-app\persistence\models\delivery.py        36      0   100%
+app\persistence\models\delivery.py        34      0   100%
 app\persistence\models\farmer.py          13      0   100%
 app\persistence\models\payout.py          26      0   100%
 app\persistence\models\price_list.py      14      0   100%
-app\persistence\queries.py                57      0   100%
+app\persistence\queries.py                63      0   100%
 app\services\__init__.py                   0      0   100%
 app\services\deliveries.py                96      0   100%
 app\services\ledger.py                    34      0   100%
-app\services\master_data.py               96      0   100%
+app\services\master_data.py               98      0   100%
 app\services\payouts.py                   90      0   100%
 --------------------------------------------------------------------
-TOTAL                                   1232      3    99%
+TOTAL                                   1257      1    99%
 
 == Business-rules layer (app/domain/*) ==
 Name                                  Stmts   Miss  Cover   Missing
 -------------------------------------------------------------------
 app\domain\__init__.py                    0      0   100%
-app\domain\clock.py                      27      0   100%
+app\domain\clock.py                      29      0   100%
 app\domain\delivery_calculations.py      48      0   100%
 app\domain\delivery_rules.py             58      0   100%
 app\domain\errors.py                     16      0   100%
 app\domain\note_rules.py                 34      0   100%
 app\domain\payout_rules.py               54      0   100%
 -------------------------------------------------------------------
-TOTAL                                   237      0   100%
+TOTAL                                   239      0   100%
