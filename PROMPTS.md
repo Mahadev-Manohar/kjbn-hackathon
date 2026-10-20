@@ -26,5 +26,12 @@
 |---|------|--------|--------------------|
 | 1 | Claude Code | "Read and thoroughly understand the code till now and the 2 documents (common instructions + Problem 4); I did M0 and M1, continue with the remaining milestones, one at a time." | Used. Reviewed the repo, then generated pure domain modules (errors, clock, delivery rules, payout rules, note rules) and unit tests for M2. Ruff config fixed; placeholder spec tests replaced by executable tests. |
 
+## M3 - API (Claude Code)
+
+| # | Tool | Prompt | What I did with it |
+|---|------|--------|--------------------|
+| 2 | Claude Code | "Is it necessary to use SQLite? Tables are set in Neon (no data). Neon is the hosted DB. Yes, React + TypeScript + Vite for FE." | Used the answer: tests and local dev run on a Docker PostgreSQL, Neon is hosted only. |
+| 3 | Claude Code | "I started Docker Desktop. Go." | Used. Generated services, FastAPI routers, error mapping, logging and API tests; I reviewed the concurrency design (per-farmer row lock) and edge-case tests. Fixed two bugs the tests exposed (mapper join for crop, log-record key collision). |
+
 ## Important implementation constraint
 The official internship documents are the source of truth for requirements. Any assumptions must be identified explicitly, and implementation decisions must not silently introduce unsupported business rules.
