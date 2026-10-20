@@ -12,6 +12,8 @@ from app.domain.delivery_calculations import (
 )
 from app.domain.errors import InvalidInputError, RuleViolationError
 
+THREE_DP = Decimal("0.001")
+TWO_DP = Decimal("0.01")
 MAX_WEIGHT_DECIMALS = 3
 MAX_MOISTURE_DECIMALS = 2
 
@@ -107,13 +109,14 @@ def quote_delivery(
         max_moisture=crop.max_moisture,
         price_per_kg=price.price_per_kg,
     )
+    # Fixed scales match the stored columns, so preview and saved record read identically.
     return DeliveryQuote(
-        gross_kg=request.gross_kg,
-        moisture=request.moisture,
-        deduction_pct=breakdown.deduction_pct,
+        gross_kg=request.gross_kg.quantize(THREE_DP),
+        moisture=request.moisture.quantize(TWO_DP),
+        deduction_pct=breakdown.deduction_pct.quantize(TWO_DP),
         deduction_kg=breakdown.deduction_kg,
         net_kg=breakdown.net_kg,
-        applied_price=price.price_per_kg,
+        applied_price=price.price_per_kg.quantize(TWO_DP),
         price_list_entry_id=price.id,
         amount=breakdown.amount,
     )
