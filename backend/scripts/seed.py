@@ -72,9 +72,7 @@ def seed() -> None:
     with SessionLocal.begin() as session:
         farmers_by_phone = {}
         for data in FARMERS:
-            farmer = session.scalar(
-                select(Farmer).where(Farmer.phone == data["phone"])
-            )
+            farmer = session.scalar(select(Farmer).where(Farmer.phone == data["phone"]))
             if farmer is None:
                 farmer = Farmer(**data)
                 session.add(farmer)

@@ -122,3 +122,8 @@ def test_zero_gross_weight_is_rejected():
 def test_non_positive_price_is_rejected():
     with pytest.raises(InvalidInputError, match="Price per kg"):
         calculate_delivery_breakdown(D("10"), D("14"), D("14"), D("25"), D("0"))
+
+
+def test_invalid_crop_moisture_limits_are_rejected():
+    with pytest.raises(InvalidInputError, match="Invalid crop moisture limits"):
+        calculate_deduction_percentage(D("10"), D("14"), D("14"))
