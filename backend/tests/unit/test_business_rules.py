@@ -1,4 +1,3 @@
-
 """
 Business-rule test specification for KJBN Problem 4.
 
@@ -19,9 +18,7 @@ import pytest
         (25.00, 14.00, 10),
     ],
 )
-def test_moisture_deduction_cases(
-    moisture, threshold, expected_deduction_pct
-):
+def test_moisture_deduction_cases(moisture, threshold, expected_deduction_pct):
     """Expected deduction percentage for threshold boundary cases."""
     pytest.skip("Specification only; implement in M2")
 
@@ -34,9 +31,7 @@ def test_moisture_deduction_cases(
         (1.000, 10, 0.100),
     ],
 )
-def test_deduction_weight_rounding_cases(
-    gross_kg, deduction_pct, expected_deduction_kg
-):
+def test_deduction_weight_rounding_cases(gross_kg, deduction_pct, expected_deduction_kg):
     """Deduction weight must use Decimal and half-up rounding to 3 dp."""
     pytest.skip("Specification only; implement in M2")
 
