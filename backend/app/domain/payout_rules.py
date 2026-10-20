@@ -56,12 +56,18 @@ def outstanding_advance(total_advances: Decimal, recovered: Decimal) -> Decimal:
     return max(total_advances - recovered, ZERO)
 
 
+def recovery_cap(gross_amount: Decimal) -> Decimal:
+    """30% of gross rounded half-up to paise; zero when gross is not positive."""
+    if gross_amount <= ZERO:
+        return ZERO
+    return (gross_amount * ADVANCE_RECOVERY_RATE).quantize(TWO_DP, rounding=ROUND_HALF_UP)
+
+
 def advance_recovery(gross_amount: Decimal, outstanding: Decimal) -> Decimal:
     """Lesser of the outstanding advance and 30% of gross, never negative."""
-    if gross_amount <= ZERO or outstanding <= ZERO:
+    if outstanding <= ZERO:
         return ZERO
-    cap = (gross_amount * ADVANCE_RECOVERY_RATE).quantize(TWO_DP, rounding=ROUND_HALF_UP)
-    return min(outstanding, cap)
+    return min(outstanding, recovery_cap(gross_amount))
 
 
 def compute_payout(line_amounts: Iterable[Decimal], outstanding: Decimal) -> PayoutTotals:
