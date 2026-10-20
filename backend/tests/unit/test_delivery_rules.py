@@ -125,3 +125,29 @@ def test_ist_date_rolls_over_before_utc_midnight():
 def test_naive_clock_value_is_rejected():
     with pytest.raises(ValueError):
         to_ist_date(datetime(2026, 10, 20, 12, 0))
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "0001-01-01T00:00:00+14:00",  # overflows converting to UTC
+        "9999-12-31T23:59:59+00:00",  # valid UTC, but the IST date would be year 10000
+        "9999-12-31T23:59:59-12:00",
+        "yesterday",
+        "",
+        "2026-13-01",
+    ],
+)
+def test_unrepresentable_clock_overrides_are_input_errors_not_crashes(raw):
+    from app.domain.clock import parse_clock_override
+
+    with pytest.raises(InvalidInputError, match="X-Test-Clock"):
+        parse_clock_override(raw)
+
+
+def test_clock_override_forms_resolve_to_the_expected_ist_date():
+    from app.domain.clock import parse_clock_override
+
+    assert parse_clock_override("2026-10-20").today == date(2026, 10, 20)
+    assert parse_clock_override("2026-10-20T23:30:00").today == date(2026, 10, 20)  # naive = IST
+    assert parse_clock_override("2026-10-20T20:00:00+00:00").today == date(2026, 10, 21)

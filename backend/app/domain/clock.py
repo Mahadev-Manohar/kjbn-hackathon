@@ -43,9 +43,11 @@ def parse_clock_override(raw: str) -> Clock:
             moment = datetime.fromisoformat(raw)
             if moment.tzinfo is None:
                 moment = moment.replace(tzinfo=IST)
-    except ValueError as error:
+        clock = Clock(moment.astimezone(UTC))
+        to_ist_date(clock.now)  # fail here, not later, if the IST date would overflow
+    except (ValueError, OverflowError) as error:
         raise InvalidInputError(
             "X-Test-Clock must be an ISO date (2026-10-20) or datetime (2026-10-20T10:00:00+05:30)",
             field="X-Test-Clock",
         ) from error
-    return Clock(moment.astimezone(UTC))
+    return clock
