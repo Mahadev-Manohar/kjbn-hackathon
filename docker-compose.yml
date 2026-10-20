@@ -1,4 +1,8 @@
-# Local PostgreSQL for development and tests. The full stack (API + UI) is added in M5.
+# One command brings up PostgreSQL, the API (migrated and seeded) and the UI:
+#   docker compose up --build
+# Ports differ from the local dev servers (API 8001, UI 5173) so both can run together.
+# UI http://localhost:8080 - API http://localhost:8002 (docs at /docs).
+# `docker compose up -d db` starts only the database, which is all the backend tests need.
 services:
   db:
     image: postgres:16-alpine
@@ -16,6 +20,37 @@ services:
       interval: 3s
       timeout: 3s
       retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://kjbn:kjbn_local_only@db:5432/kjbn_dev
+      APP_ENV: development
+      LOG_LEVEL: INFO
+      CORS_ORIGINS: http://localhost:8080
+      ALLOW_TEST_CLOCK: "true"
+    ports:
+      - "8002:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8002
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
 
 volumes:
   pgdata:
