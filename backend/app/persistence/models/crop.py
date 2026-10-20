@@ -29,7 +29,3 @@ class Crop(Base):
         cascade="all, delete-orphan",
         lazy="raise",
     )
-    price_list_entries: Mapped[list["PriceListEntry"]] = relationship(
-        back_populates="crop",
-        lazy="raise",
-    )

@@ -47,7 +47,9 @@ class PriceListEntry(Base):
     price_per_kg: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     effective_from: Mapped[date] = mapped_column(Date, nullable=False, index=True)
 
+    # crop_id is only part of a composite FK to crop_grades, so spell out the join to crops.
     crop: Mapped["Crop"] = relationship(
-        back_populates="price_list_entries",
+        primaryjoin="Crop.id == foreign(PriceListEntry.crop_id)",
+        viewonly=True,
         lazy="raise",
     )

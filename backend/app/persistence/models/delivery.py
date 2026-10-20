@@ -104,7 +104,12 @@ class Delivery(Base):
     reason: Mapped[str | None] = mapped_column(Text)
 
     farmer: Mapped["Farmer"] = relationship(back_populates="deliveries", lazy="raise")
-    crop: Mapped["Crop"] = relationship(lazy="raise")
+    # crop_id is only part of a composite FK to crop_grades, so spell out the join to crops.
+    crop: Mapped["Crop"] = relationship(
+        primaryjoin="Crop.id == foreign(Delivery.crop_id)",
+        viewonly=True,
+        lazy="raise",
+    )
     price_list_entry: Mapped["PriceListEntry | None"] = relationship(lazy="raise")
     payout: Mapped["Payout | None"] = relationship(back_populates="deliveries", lazy="raise")
     original_delivery: Mapped["Delivery | None"] = relationship(
