@@ -1,0 +1,21 @@
+# Local PostgreSQL for development and tests. The full stack (API + UI) is added in M5.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: kjbn
+      POSTGRES_PASSWORD: kjbn_local_only
+      POSTGRES_DB: kjbn_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/scripts/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kjbn -d kjbn_dev"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
