@@ -371,3 +371,38 @@ def test_concurrent_deliveries_and_finalise_never_orphan_a_delivery(api, world):
     # every delivery in the week is either on the finalised payout, or was never saved
     assert all(d["payout_id"] == payout["id"] for d in same_week)
     assert D(final["gross_amount"]) == sum(D(d["amount"]) for d in same_week)
+
+
+def test_ledger_caps_each_list_but_keeps_balances_exact(api, world):
+    farmer_id, crop_id = world["farmer"]["id"], world["crop"]["id"]
+    for day in range(1, 6):
+        api.advance(farmer_id, "100.00", f"2026-09-0{day}")
+    for day in ("2026-10-12", "2026-10-13", "2026-10-14"):
+        api.delivery(farmer_id, crop_id, delivered_on=day)
+
+    summary = api.client.get(f"/api/v1/farmers/{farmer_id}/ledger", params={"limit": 2}).json()
+    assert summary["limit"] == 2
+    assert (summary["deliveries_total"], summary["advances_total"]) == (3, 5)
+    assert len(summary["deliveries"]) == 2 and len(summary["advances"]) == 2
+    assert summary["deliveries"][0]["delivered_on"] == "2026-10-14"  # newest first
+    assert summary["total_advances"] == summary["outstanding_advance"] == "500.00"  # not capped
+
+    assert (
+        api.client.get(f"/api/v1/farmers/{farmer_id}/ledger", params={"limit": 0}).status_code
+        == 422
+    )
+    assert (
+        api.client.get(f"/api/v1/farmers/{farmer_id}/ledger", params={"limit": 201}).status_code
+        == 422
+    )
+
+
+def test_advances_list_is_paginated(api, world):
+    farmer_id = world["farmer"]["id"]
+    for day in range(1, 4):
+        api.advance(farmer_id, f"{day}0.00", f"2026-09-0{day}")
+    page = api.client.get(
+        f"/api/v1/farmers/{farmer_id}/advances", params={"limit": 2, "offset": 2}
+    ).json()
+    assert page["total"] == 3 and [a["amount"] for a in page["items"]] == ["10.00"]
+    assert api.client.get("/api/v1/farmers/999/advances").status_code == 404

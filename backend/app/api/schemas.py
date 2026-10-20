@@ -264,6 +264,10 @@ class LedgerOut(BaseModel):
     total_advances: Decimal
     total_recovered: Decimal
     outstanding_advance: Decimal
+    limit: int
+    deliveries_total: int
+    advances_total: int
+    payouts_total: int
     deliveries: list[DeliveryOut]
     advances: list[AdvanceOut]
     payouts: list[PayoutOut]

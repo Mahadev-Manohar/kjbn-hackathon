@@ -51,6 +51,17 @@ def record_advance(farmer_id: int, body: AdvanceIn, session: DbSession, clock: R
     return master_data.record_advance(session, farmer_id, body.amount, body.given_on, clock)
 
 
+@router.get("/{farmer_id}/advances", response_model=Page[AdvanceOut])
+def list_advances(farmer_id: int, session: DbSession, limit: Limit = 50, offset: Offset = 0):
+    items, total = ledger.list_advances(session, farmer_id, limit, offset)
+    return Page(items=items, total=total, limit=limit, offset=offset)
+
+
 @router.get("/{farmer_id}/ledger", response_model=LedgerOut)
-def get_ledger(farmer_id: int, session: DbSession):
-    return ledger.farmer_ledger(session, farmer_id)
+def get_ledger(farmer_id: int, session: DbSession, limit: Limit = 50):
+    """Exact balances plus the newest `limit` deliveries, advances and payouts.
+
+    Page through the rest with GET /deliveries, /payouts (filter by farmer_id) and
+    GET /farmers/{id}/advances.
+    """
+    return ledger.farmer_ledger(session, farmer_id, limit)
