@@ -127,3 +127,35 @@ def test_non_positive_price_is_rejected():
 def test_invalid_crop_moisture_limits_are_rejected():
     with pytest.raises(InvalidInputError, match="Invalid crop moisture limits"):
         calculate_deduction_percentage(D("10"), D("14"), D("14"))
+
+
+def test_deduction_weight_tie_rounds_half_up_not_to_even():
+    # 1% of 0.050 kg is exactly 0.0005 kg: half-up gives 0.001 (banker's rounding would give 0.000)
+    result = calculate_delivery_breakdown(
+        gross_kg=D("0.050"),
+        moisture=D("15"),
+        threshold=D("14"),
+        max_moisture=D("25"),
+        price_per_kg=D("10.00"),
+    )
+    assert result.deduction_kg == D("0.001")
+    assert result.net_kg == D("0.049")
+
+
+def test_breakdown_invariants_hold_for_many_random_inputs():
+    """net = gross - deduction exactly; amount = net x price rounded half-up to paise."""
+    import random
+
+    rng = random.Random(4)
+    for _ in range(3000):
+        gross = D(rng.randint(1, 9_999_999)) / D(1000)
+        moisture = D(rng.randint(1, 2500)) / D(100)
+        price = D(rng.randint(1, 1_000_000)) / D(100)
+        result = calculate_delivery_breakdown(gross, moisture, D("14"), D("25"), price)
+        assert result.deduction_kg + result.net_kg == gross.quantize(D("0.001"))
+        assert result.amount == (result.net_kg * price).quantize(
+            D("0.01"), rounding="ROUND_HALF_UP"
+        )
+        assert D("0") <= result.deduction_pct <= D("10")
+        expected_pct = min(max((moisture - D("14")) // D(1), D(0)), D(10))
+        assert result.deduction_pct == expected_pct

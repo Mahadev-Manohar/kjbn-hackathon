@@ -110,9 +110,4 @@ class Delivery(Base):
         viewonly=True,
         lazy="raise",
     )
-    price_list_entry: Mapped["PriceListEntry | None"] = relationship(lazy="raise")
     payout: Mapped["Payout | None"] = relationship(back_populates="deliveries", lazy="raise")
-    original_delivery: Mapped["Delivery | None"] = relationship(
-        remote_side="Delivery.id",
-        lazy="raise",
-    )

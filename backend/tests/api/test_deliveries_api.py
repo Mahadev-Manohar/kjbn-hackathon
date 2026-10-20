@@ -227,3 +227,13 @@ def test_editing_a_delivery_refreezes_the_breakdown(api, world):
         "2.00",
     )
     assert edited["amount"] == "4312.00"  # 196 kg x 22
+
+
+def test_json_numbers_are_read_exactly_not_through_binary_floats(api, world):
+    # 33.333 and 16.5 sent as JSON numbers (not strings) must be stored exactly
+    body = api.delivery_body(world["farmer"]["id"], world["crop"]["id"])
+    body.update({"gross_kg": 33.333, "moisture": 16.5})
+    delivery = api.post("/deliveries", body)
+    assert delivery["gross_kg"] == "33.333" and delivery["moisture"] == "16.50"
+    assert delivery["deduction_kg"] == "0.667" and delivery["net_kg"] == "32.666"
+    assert delivery["amount"] == "783.98"  # 32.666 x 24.00 = 783.984

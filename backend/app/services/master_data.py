@@ -36,8 +36,18 @@ def update_farmer(session: Session, farmer_id: int, **fields) -> Farmer:
 def list_farmers(session: Session, search: str | None, limit: int, offset: int):
     query = select(Farmer)
     if search:
-        pattern = f"%{search}%"
-        query = query.where(Farmer.name.ilike(pattern) | Farmer.village.ilike(pattern))
+        # Escape LIKE wildcards so "50%" or "a_b" search for those literal characters.
+        backslash = chr(92)
+        escaped = (
+            search.replace(backslash, backslash * 2)
+            .replace("%", backslash + "%")
+            .replace("_", backslash + "_")
+        )
+        pattern = f"%{escaped}%"
+        query = query.where(
+            Farmer.name.ilike(pattern, escape=backslash)
+            | Farmer.village.ilike(pattern, escape=backslash)
+        )
     total = session.scalar(select(func.count()).select_from(query.subquery()))
     items = session.scalars(query.order_by(Farmer.name, Farmer.id).limit(limit).offset(offset))
     return list(items), total

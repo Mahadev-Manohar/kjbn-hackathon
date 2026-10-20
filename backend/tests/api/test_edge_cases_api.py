@@ -79,7 +79,7 @@ def test_delivery_list_crop_filter(api, world):
     assert [d["crop_name"] for d in result["items"]] == ["Turmeric"]
 
 
-def test_health_reports_503_when_the_database_is_down(client):
+def test_health_reports_503_when_the_database_is_down(client, caplog):
     class BrokenSession:
         def execute(self, *args, **kwargs):
             raise ConnectionError("database down")
@@ -92,6 +92,7 @@ def test_health_reports_503_when_the_database_is_down(client):
         response = client.get("/health")
     finally:
         app.dependency_overrides.clear()
+    assert any(r.getMessage() == "health_check_failed" for r in caplog.records)
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "database_unavailable"
 
