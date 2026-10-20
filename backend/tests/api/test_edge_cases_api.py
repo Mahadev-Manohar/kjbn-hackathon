@@ -112,3 +112,12 @@ def test_small_amounts_round_half_up_to_paise(api, world):
         for gross in ("0.001", "0.021", "0.023")
     }
     assert results == {"0.001": "0.02", "0.021": "0.50", "0.023": "0.55"}
+
+
+def test_delivery_list_farmer_filter(api, world):
+    crop_id = world["crop"]["id"]
+    other = api.farmer("Meena Devi", "9000000002")
+    api.delivery(world["farmer"]["id"], crop_id)
+    api.delivery(other["id"], crop_id)
+    result = api.client.get("/api/v1/deliveries", params={"farmer_id": other["id"]}).json()
+    assert result["total"] == 1 and result["items"][0]["farmer_id"] == other["id"]
