@@ -1,6 +1,6 @@
 # Produce Procurement & Payout
 
-KJBN Labs Software Engineering Internship — Problem 4.
+KJBN Labs Software Engineering Internship ï¿½ Problem 4.
 
 A produce procurement and payout system for recording farmer deliveries, applying crop-grade prices and moisture deductions, tracking advances, and generating weekly payouts.
 
@@ -54,4 +54,4 @@ The application and UI are not yet implemented or deployed.
 
 ## 12. AI and third-party usage
 
-ChatGPT was used for development assistance. See `PROMPTS.md` for the prompt log, which will be maintained throughout the project.
+ChatGPT (M0-M1) and Claude Code (M2 onward) were used for development assistance. See `PROMPTS.md` for the prompt log, which will be maintained throughout the project.
