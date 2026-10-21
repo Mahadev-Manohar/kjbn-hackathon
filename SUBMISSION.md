@@ -19,7 +19,7 @@ I built a produce buying-centre system with a FastAPI backend, a React/TypeScrip
 
 ## C. The hardest part
 
-The failure paths, which looked finished before they were. In M1 I gave `Delivery.crop` only a composite foreign key; SQLAlchemy could not configure the mappers, so every query would fail, but M1 only seeded data and ran skipped placeholders, so the first M3 API test found it (`3e1ed93`). Then I stamped domain ids onto log records; when a rule violation passed the same key through `extra=`, `logging` raised and every domain error became a 500, which seven failing API tests showed at once (`ce13ee6`). Finally, after a 20-body malformed-input test passed, a fuzz test over every route found a 500 from `X-Test-Clock: 0001-01-01T00:00:00+14:00` (`4a68684`). I now test hostile input across all routes, not a sample.
+The failure paths, which looked finished before they were. In M1 I gave `Delivery.crop` only a composite foreign key; SQLAlchemy could not configure the mappers, so every query would fail, but M1 only seeded data and ran skipped placeholders, so the first M3 API test found it (`924329b`). Then I stamped domain ids onto log records; when a rule violation passed the same key through `extra=`, `logging` raised and every domain error became a 500, which seven failing API tests showed at once (`2c9d9da`). Finally, after a 20-body malformed-input test passed, a fuzz test over every route found a 500 from `X-Test-Clock: 0001-01-01T00:00:00+14:00` (`1ef674f`). I now test hostile input across all routes, not a sample.
 
 ## D. How I handle failure
 
@@ -38,13 +38,13 @@ Every response uses one shape and carries the request id. A failed request rolls
 |---|---|---|
 | M0 Scaffold | 2026-10-18 | `1470a1b` |
 | M1 Domain model | 2026-10-19 | `2685874` |
-| M2 Business rules | 2026-10-20 | `4629c4b` |
-| M3 API | 2026-10-20 | `74f099b` |
-| M4 UI | 2026-10-20 | `46e4b90` |
-| M5 Deployment (live, CI green) | 2026-10-21 | `94d900e` |
-| M6 Documentation (README complete; the `v1.0` tag is on the final commit) | 2026-10-22 | `e5bdeb5` |
+| M2 Business rules | 2026-10-20 | `397b881` |
+| M3 API | 2026-10-20 | `d8a05b2` |
+| M4 UI | 2026-10-20 | `f644b49` |
+| M5 Deployment (live, CI green) | 2026-10-21 | `f361dfe` |
+| M6 Documentation (README complete; the `v1.0` tag is on the final commit) | 2026-10-22 | `96fb79e` |
 
-Later `[M3]`, `[M4]` and `[M5]` commits (for example `4a68684`, `b567f1f`) are fixes from my pre-submission audit.
+Later `[M3]`, `[M4]` and `[M5]` commits (for example `1ef674f`, `3da67e7`) are fixes from my pre-submission audit.
 
 ## F. If I had two more days
 
