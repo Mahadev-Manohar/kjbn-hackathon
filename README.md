@@ -369,7 +369,6 @@ curl -X POST https://kjbn-produce-payout-api.onrender.com/api/v1/deliveries/prev
 - **The test clock also stamps `finalised_at` and `paid_at`**, so those timestamps reflect the overridden clock when it is used. The seed's timestamps are a fixed instant (20 Oct 2026, 10:00 IST).
 - **React components have no automated tests**; only the formatting helpers and the API client do. UI behaviour was checked manually and with a browser script that is not in the repository.
 - **Stretch items were not attempted** (multi-centre, PDF statement, quality bonus).
-- **Git history:** three early commit subjects do not follow the commit format exactly (two are 3 to 4 characters over 72, and one uses the type `build`, which is not in the allowed list). The history was not rewritten after publication.
 
 ## 12. AI and third-party usage
 

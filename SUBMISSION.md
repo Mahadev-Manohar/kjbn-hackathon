@@ -19,7 +19,7 @@ I built a produce buying-centre system with a FastAPI backend, a React/TypeScrip
 
 ## C. The hardest part
 
-The failure paths, which looked finished before they were. In M1 I gave `Delivery.crop` only a composite foreign key; SQLAlchemy could not configure the mappers, so every query would fail, but M1 only seeded data and ran skipped placeholders, so the first M3 API test found it (`036fce8`). Then I stamped domain ids onto log records; when a rule violation passed the same key through `extra=`, `logging` raised and every domain error became a 500, which seven failing API tests showed at once (`eaf3731`). Finally, after a 20-body malformed-input test passed, a fuzz test over every route found a 500 from `X-Test-Clock: 0001-01-01T00:00:00+14:00` (`931ff20`). I now test hostile input across all routes, not a sample.
+The failure paths, which looked finished before they were. In M1 I gave `Delivery.crop` only a composite foreign key; SQLAlchemy could not configure the mappers, so every query would fail, but M1 only seeded data and ran skipped placeholders, so the first M3 API test found it (`3e1ed93`). Then I stamped domain ids onto log records; when a rule violation passed the same key through `extra=`, `logging` raised and every domain error became a 500, which seven failing API tests showed at once (`ce13ee6`). Finally, after a 20-body malformed-input test passed, a fuzz test over every route found a 500 from `X-Test-Clock: 0001-01-01T00:00:00+14:00` (`4a68684`). I now test hostile input across all routes, not a sample.
 
 ## D. How I handle failure
 
@@ -39,12 +39,12 @@ Every response uses one shape and carries the request id. A failed request rolls
 | M0 Scaffold | 2026-10-18 | `1470a1b` |
 | M1 Domain model | 2026-10-19 | `2685874` |
 | M2 Business rules | 2026-10-20 | `4629c4b` |
-| M3 API | 2026-10-20 | `521c3d3` |
-| M4 UI | 2026-10-20 | `4b592d5` |
-| M5 Deployment (live, CI green) | 2026-10-21 | `ff334c2` |
-| M6 Documentation (README complete; `v1.0` tag is on the commit that adds this file) | 2026-10-22 | `f3c66ea` |
+| M3 API | 2026-10-20 | `74f099b` |
+| M4 UI | 2026-10-20 | `46e4b90` |
+| M5 Deployment (live, CI green) | 2026-10-21 | `94d900e` |
+| M6 Documentation (README complete; the `v1.0` tag is on the final commit) | 2026-10-22 | `e5bdeb5` |
 
-Later `[M3]`, `[M4]` and `[M5]` commits (for example `931ff20`, `7e40c9b`) are fixes from my pre-submission audit.
+Later `[M3]`, `[M4]` and `[M5]` commits (for example `4a68684`, `b567f1f`) are fixes from my pre-submission audit.
 
 ## F. If I had two more days
 
@@ -67,5 +67,5 @@ Later `[M3]`, `[M4]` and `[M5]` commits (for example `931ff20`, `7e40c9b`) are f
 | UI usability (6) | 4 | All flows work at laptop and 375px with loading, error and disabled states; no delivery-edit screen and plain styling. |
 | Testing (7) | 5 | 182 tests with boundary cases, random rounding invariants, concurrency and fuzzing; 99% overall and 100% on the rules layer. |
 | Deployment and operability (5) | 4 | One-command Compose, Dockerfiles, CI, migrate-and-seed, live and verified; manual dashboard steps and the test clock enabled in production. |
-| Git hygiene (4) | 3 | Milestone commits and steady history, but three early subjects break the format (two over 72 characters, one `build` type). |
+| Git hygiene (4) | 4 | Milestone commits in order with Conventional Commit subjects, steady daily progress, no secrets or build output; three early subjects were reworded after publication (content unchanged) to meet the format. |
 | Documentation and write-up (4) | 4 | README verified from a clean clone, with assumptions and limitations stated; the write-up is dense to fit two pages. |
