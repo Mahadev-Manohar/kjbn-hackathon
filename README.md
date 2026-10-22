@@ -372,7 +372,7 @@ curl -X POST https://kjbn-produce-payout-api.onrender.com/api/v1/deliveries/prev
 
 ## 12. AI and third-party usage
 
-**AI assistants.** ChatGPT was used for M0 and M1 (planning, scaffold, models, migration, seed, test specifications). Claude Code was used from M2 onward: the domain rules and their tests, services and API, error handling and logging, the React UI, the Docker/CI/Render/Vercel files, deployment checks, the audit before this milestone, and this documentation. I reviewed, ran and can explain the code; the business rules are the part I am answerable for line by line. The complete prompt log, with every message to Claude Code verbatim and the reconstructed M0/M1 prompts, is in [`PROMPTS.md`](PROMPTS.md).
+**AI assistants.** ChatGPT was used for M0 and M1 (planning, scaffold, models, migration, seed, test specifications). Claude Code was used from M2 onward: the domain rules and their tests, services and API, error handling and logging, the React UI, the Docker/CI/Render/Vercel files, deployment checks, the audit before this milestone, and this documentation. I reviewed, ran and can explain the code; the business rules are the part I am answerable for line by line. The complete prompt log ( every message to ChatGPT and Claude Code, lightly edited for spelling and clarity) is in [`PROMPTS.md`](PROMPTS.md).
 
 **Templates and snippets.** The frontend was scaffolded with the official Vite `react-ts` template (`npm create vite`); its demo content was removed. Alembic's generated `env.py`/`script.py.mako` were adapted. No code was copied from another project or candidate.
 
